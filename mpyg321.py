@@ -1,6 +1,31 @@
 import pexpect
 from threading import Thread
 
+mpgouts = [
+    {
+        "mpg_code": "@P 0",
+        "action": "user_stop",
+        "description": "Music has been stopped by the user."
+    },
+    {
+        "mpg_code": "@P 1",
+        "action": "user_pause",
+        "description": "Music has been paused by the user."
+    },
+    {
+        "mpg_code": "@P 2",
+        "action": "user_resume",
+        "description": "Music has been resumed by the user."
+    },
+    {
+        "mpg_code": "@P 3",
+        "action": "end_of_song",
+        "description": "Player has reached the end of the song."
+    }
+]
+
+mpgcodes = [v["mpg_code"] for v in mpgouts]
+
 
 class PlayerStatus:
     INSTANCIATED = 0
@@ -26,7 +51,20 @@ class MPyg321Player:
 
     def process_output(self):
         """Parses the output"""
-        self.player.expect("hello")
+        while True:
+            index = self.player.expect(mpgcodes)
+            action = mpgouts[index]["action"]
+            if action == "user_stop":
+                self.onAnyStop()
+                self.onUserStop()
+            if action == "user_pause":
+                self.onAnyStop()
+                self.onUserPause()
+            if action == "user_resume":
+                self.onUserResume()
+            if action == "end_of_song":
+                self.onAnyStop()
+                self.onMusicEnd()
 
     def play_song(self, path):
         """Plays the song"""
@@ -54,3 +92,24 @@ class MPyg321Player:
         """Quits the player"""
         self.player.sendline("QUIT")
         self.status = PlayerStatus.QUITTED
+
+    # # # Callbacks # # #
+    def onAnyStop(self):
+        """Callback when the music stops for any reason"""
+        pass
+
+    def onUserPause(self):
+        """Callback when user pauses the music"""
+        pass
+
+    def onUserResume(self):
+        """Callback when user resumes the music"""
+        pass
+
+    def onUserStop(self):
+        """Callback when user stops music"""
+        pass
+
+    def onMusicEnd(self):
+        """Callback when music ends"""
+        pass
