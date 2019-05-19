@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="mpg321-4br3mm0rd",
+    name="mpyg321",
     version="0.0.1",
     author="4br3mm0rd",
     author_email="4br3mm0rd@example.com",
