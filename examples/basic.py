@@ -3,7 +3,7 @@ MPyG321 basic example
 Playing and pausing some music
 You need to add a "sample.mp3" file in the working directory
 """
-from mpyg321 import MPyg321Player
+from mpyg321.mpyg321 import MPyg321Player
 from time import sleep
 
 
