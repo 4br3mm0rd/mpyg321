@@ -17,6 +17,7 @@ def do_some_play_pause(player):
     sleep(5)
     player.stop()
 
+
 def do_some_jumps(player):
     """Does some jumps"""
     player.play_song("sample.mp3")
@@ -35,12 +36,14 @@ def do_some_jumps(player):
     sleep(3)
     player.stop()
 
+
 def main():
     """Do the magic"""
     player = MPyg321Player()
     do_some_play_pause(player)
     do_some_jumps(player)
     player.quit()
+
 
 if __name__ == "__main__":
     main()
