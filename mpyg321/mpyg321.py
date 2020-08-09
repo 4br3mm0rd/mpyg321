@@ -93,6 +93,10 @@ class MPyg321Player:
         self.player.sendline("QUIT")
         self.status = PlayerStatus.QUITTED
 
+    def jump(self, pos):
+        """Jump to position"""
+        self.player.sendline("JUMP " + str(pos))
+
     # # # Callbacks # # #
     def onAnyStop(self):
         """Callback when the music stops for any reason"""
