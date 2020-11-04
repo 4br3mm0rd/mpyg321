@@ -41,9 +41,10 @@ class MPyg321Player:
     status = None
     output_processor = None
 
-    def __init__(self):
+    def __init__(self, backend="mpg321"):
         """Builds the player and creates the callbacks"""
-        self.player = pexpect.spawn("mpg321 -R somerandomword", timeout=None)
+        self.backend = backend
+        self.player = pexpect.spawn(self.backend + " -R somerandomword", timeout=None)
         self.status = PlayerStatus.INSTANCIATED
         self.output_processor = Thread(target=self.process_output)
         self.output_processor.daemon = True
