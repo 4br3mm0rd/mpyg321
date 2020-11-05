@@ -1,6 +1,27 @@
 import pexpect
 from threading import Thread
 
+def check_installed():
+    import os
+
+    path = os.environ["PATH"].split(os.pathsep)
+    for directory in path:
+        mpg321_path = os.path.join(directory, "mpg321")
+        mpg123_path = os.path.join(directory, "mpg123")
+
+        if os.path.exists(mpg321_path):
+            return "mpg321"
+        elif os.path.exists(mpg123_path):
+            return "mpg123"
+
+    return False
+
+if not(check_installed()):
+    raise FileNotFoundError("No suitable program found. Please install mpg321 or mpg123 and try again.")
+else:
+    player_command = check_installed()
+
+
 mpgouts = [
     {
         "mpg_code": "@P 0",
@@ -41,10 +62,9 @@ class MPyg321Player:
     status = None
     output_processor = None
 
-    def __init__(self, backend="mpg321"):
-        """Builds the player using given backend (defaults to mpg321) and creates the callbacks"""
-        self.backend = backend
-        self.player = pexpect.spawn(self.backend + " -R somerandomword", timeout=None)
+    def __init__(self):
+        """Builds the player using global player command and creates the callbacks"""
+        self.player = pexpect.spawn(player_command + " -R somerandomword", timeout=None)
         self.status = PlayerStatus.INSTANCIATED
         self.output_processor = Thread(target=self.process_output)
         self.output_processor.daemon = True
