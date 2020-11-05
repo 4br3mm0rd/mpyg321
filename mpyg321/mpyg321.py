@@ -2,6 +2,7 @@ import pexpect
 from threading import Thread
 
 def check_installed():
+    """Checks if mpg321 or mpg123 is installed"""
     import os
 
     path = os.environ["PATH"].split(os.pathsep)
@@ -63,7 +64,7 @@ class MPyg321Player:
     output_processor = None
 
     def __init__(self):
-        """Builds the player using global player command and creates the callbacks"""
+        """Builds the player using global player_command and creates the callbacks"""
         self.player = pexpect.spawn(player_command + " -R somerandomword", timeout=None)
         self.status = PlayerStatus.INSTANCIATED
         self.output_processor = Thread(target=self.process_output)
