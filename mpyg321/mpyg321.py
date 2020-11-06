@@ -1,6 +1,7 @@
 import pexpect
 from threading import Thread
 
+
 def check_installed():
     """Checks if mpg321 or mpg123 is installed"""
     import os
@@ -17,11 +18,11 @@ def check_installed():
 
     return False
 
+
 if not(check_installed()):
     raise FileNotFoundError("No suitable program found. Please install mpg321 or mpg123 and try again.")
 else:
     player_command = check_installed()
-
 
 mpgouts = [
     {
