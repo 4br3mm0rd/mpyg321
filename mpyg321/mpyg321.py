@@ -2,21 +2,19 @@ import pexpect
 from threading import Thread
 
 
-def check_installed():
-    """Checks if mpg321 or mpg123 is installed"""
+def is_installed(name):
+    """Checks if a program is installed"""
     import os
+    import subprocess
 
-    path = os.environ["PATH"].split(os.pathsep)
-    for directory in path:
-        mpg321_path = os.path.join(directory, "mpg321")
-        mpg123_path = os.path.join(directory, "mpg123")
 
-        if os.path.exists(mpg321_path):
-            return "mpg321"
-        elif os.path.exists(mpg123_path):
-            return "mpg123"
-
-    return False
+    devnull = open(os.devnull)
+    try:
+        subprocess.Popen([name, "--help"], stdout=devnull, stderr=devnull).communicate()
+    except FileNotFoundError:
+        print(name + " not installed.")
+        return False
+    return True
 
 
 mpgouts = [
@@ -61,10 +59,12 @@ class MPyg321Player:
 
     def __init__(self):
         """Builds the player and creates the callbacks"""
-        if not(check_installed()):
-            raise FileNotFoundError("No suitable program found. Please install mpg321 or mpg123 and try again.")
+        if is_installed("mpg321"):
+            player_command = "mpg321"
+        elif is_installed("mpg123"):
+            player_command = "mpg123"
         else:
-            player_command = check_installed()
+            raise FileNotFoundError("No suitable program found. PLease install mpg321 or mpg123 and try again.")
 
         self.player = pexpect.spawn(player_command + " -R somerandomword", timeout=None)
         self.status = PlayerStatus.INSTANCIATED
