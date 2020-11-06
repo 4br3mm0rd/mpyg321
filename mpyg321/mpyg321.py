@@ -10,9 +10,9 @@ def is_installed(name):
 
     devnull = open(os.devnull)
     try:
-        subprocess.Popen([name, "--help"], stdout=devnull, stderr=devnull).communicate()
+        subprocess.Popen([name, "--help"], stdout=devnull, \
+                stderr=devnull).communicate()
     except FileNotFoundError:
-        print(name + " not installed.")
         return False
     return True
 
@@ -64,9 +64,11 @@ class MPyg321Player:
         elif is_installed("mpg123"):
             player_command = "mpg123"
         else:
-            raise FileNotFoundError("No suitable program found. PLease install mpg321 or mpg123 and try again.")
+            raise FileNotFoundError("No suitable program found.
+                    Please install mpg321 or mpg123 and try again.")
 
-        self.player = pexpect.spawn(player_command + " -R somerandomword", timeout=None)
+        self.player = pexpect.spawn(player_command + " -R somerandomword",
+                timeout=None)
         self.status = PlayerStatus.INSTANCIATED
         self.output_processor = Thread(target=self.process_output)
         self.output_processor.daemon = True
