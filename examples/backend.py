@@ -7,6 +7,7 @@ You need to add a "sample.mp3" file in the working directory
 from mpyg321.mpyg321 import MPyg321Player
 from time import sleep
 
+
 def do_some_play_pause(player):
     """Does some play and pause"""
     player.play_song("sample.mp3")
@@ -35,6 +36,7 @@ def do_some_jumps(player):
     player.jump("-1s")
     sleep(3)
     player.stop()
+
 
 def main():
     """Do the magic"""
