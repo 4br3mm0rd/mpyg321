@@ -19,11 +19,6 @@ def check_installed():
     return False
 
 
-if not(check_installed()):
-    raise FileNotFoundError("No suitable program found. Please install mpg321 or mpg123 and try again.")
-else:
-    player_command = check_installed()
-
 mpgouts = [
     {
         "mpg_code": "@P 0",
@@ -65,7 +60,12 @@ class MPyg321Player:
     output_processor = None
 
     def __init__(self):
-        """Builds the player using global player_command and creates the callbacks"""
+        """Builds the player and creates the callbacks"""
+        if not(check_installed()):
+            raise FileNotFoundError("No suitable program found. Please install mpg321 or mpg123 and try again.")
+        else:
+            player_command = check_installed()
+
         self.player = pexpect.spawn(player_command + " -R somerandomword", timeout=None)
         self.status = PlayerStatus.INSTANCIATED
         self.output_processor = Thread(target=self.process_output)
