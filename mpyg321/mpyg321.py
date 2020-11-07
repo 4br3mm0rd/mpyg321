@@ -2,21 +2,6 @@ import pexpect
 from threading import Thread
 
 
-def is_installed(name):
-    """Checks if a program is installed"""
-    import os
-    import subprocess
-
-
-    devnull = open(os.devnull)
-    try:
-        subprocess.Popen([name, "--help"], stdout=devnull, \
-                stderr=devnull).communicate()
-    except FileNotFoundError:
-        return False
-    return True
-
-
 mpgouts = [
     {
         "mpg_code": "@P 0",
