@@ -9,6 +9,7 @@ from time import sleep
 
 class MyPlayer(MPyg321Player):
     """We create a class extending the basic player to implement callbacks"""
+
     def onAnyStop(self):
         """Callback when the music stops for any reason"""
         print("The music has stopped")
@@ -46,6 +47,7 @@ def main():
     """Do the magic"""
     player = MyPlayer()
     do_some_play_pause(player)
+
 
 if __name__ == "__main__":
     main()

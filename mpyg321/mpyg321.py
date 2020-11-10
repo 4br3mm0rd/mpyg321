@@ -46,14 +46,14 @@ class MPyg321Player:
         """Builds the player and creates the callbacks"""
         try:
             self.player = pexpect.spawn("mpg321 -R somerandomword",
-                    timeout=None)
+                                        timeout=None)
         except pexpect.exceptions.ExceptionPexpect:
             try:
                 self.player = pexpect.spawn("mpg123 -R somerandomword",
-                        timeout=None)
+                                            timeout=None)
             except pexpect.exceptions.ExceptionPexpect:
-                raise FileNotFoundError("No suitable command found. Please
-                install mpg321 or mpg123 and try again.")
+                raise FileNotFoundError("""\
+No suitable command found. Please install mpg321 or mpg123 and try again.""")
 
         self.status = PlayerStatus.INSTANCIATED
         self.output_processor = Thread(target=self.process_output)
