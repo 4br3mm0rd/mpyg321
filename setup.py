@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="mpyg321",
-    version="0.0.4",
+    version="0.1.0",
     author="4br3mm0rd",
     author_email="4br3mm0rd@example.com",
     description="mpg321 wrapper for python - command line music player",
