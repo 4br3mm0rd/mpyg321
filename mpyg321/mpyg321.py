@@ -22,6 +22,11 @@ mpgouts = [
         "mpg_code": "@P 3",
         "action": "end_of_song",
         "description": "Player has reached the end of the song."
+    },
+    {
+        "mpg_code": "@E *",
+        "action": "error",
+        "description": "Player has encountered an error."
     }
 ]
 
@@ -76,6 +81,8 @@ No suitable command found. Please install mpg321 or mpg123 and try again.""")
             if action == "end_of_song":
                 self.onAnyStop()
                 self.onMusicEnd()
+            if action == "error":
+                self.handle_errors()
 
     def play_song(self, path):
         """Plays the song"""
@@ -107,6 +114,11 @@ No suitable command found. Please install mpg321 or mpg123 and try again.""")
     def jump(self, pos):
         """Jump to position"""
         self.player.sendline("JUMP " + str(pos))
+
+    def handle_errors(self):
+        """Handle errors encountered by the player"""
+        output = self.player.readline().decode("utf-8")
+        raise Exception(output)
 
     # # # Callbacks # # #
     def onAnyStop(self):
