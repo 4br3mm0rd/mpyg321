@@ -42,6 +42,6 @@ To work with mpg321 instead:
 
 ```
 from mpyg321.mpyg321 import MPyg321Player
-player = MPyg321Player("mpg123")
+player = MPyg321Player()
 player.play_song("/path/to/some_mp3.mp3")
 ```
