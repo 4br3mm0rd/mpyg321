@@ -22,7 +22,7 @@ $ pip3 install mpyg321
 
 ## Windows
 
-For windows installation, download mpg321 on the website: [Link] (https://www.mpg123.de/download.shtml mpg123.de). Make sure to rename the command to mpg321, and then run:
+For windows installation, download mpg321 on the website: [mpg321's website](https://www.mpg123.de/download.shtml). Make sure to rename the command to mpg321, and then run:
 
 ```
 $ pip install mpyg321
