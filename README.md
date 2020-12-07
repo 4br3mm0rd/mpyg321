@@ -31,15 +31,6 @@ $ pip install mpyg321
 # Usage
 
 Usage is pretty straight forward, and all the functionnalities are easily shown in the examples folder.
-
-```
-from mpyg321.mpyg321 import MPyg321Player()
-player = MPyg321Player()
-player.play_song("/path/to/some_mp3.mp3")
-```
-
-To work with mpg321 instead:
-
 ```
 from mpyg321.mpyg321 import MPyg321Player
 player = MPyg321Player()
