@@ -33,6 +33,10 @@ mpgouts = [
 mpgcodes = [v["mpg_code"] for v in mpgouts]
 
 
+class PlayerError(Exception):
+    pass
+
+
 class PlayerStatus:
     INSTANCIATED = 0
     PLAYING = 1
@@ -118,7 +122,7 @@ No suitable command found. Please install mpg321 or mpg123 and try again.""")
     def handle_errors(self):
         """Handle errors encountered by the player"""
         output = self.player.readline().decode("utf-8")
-        raise Exception(output)
+        raise PlayerError(output)
 
     # # # Callbacks # # #
     def onAnyStop(self):
