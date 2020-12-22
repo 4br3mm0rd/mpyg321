@@ -33,8 +33,8 @@ mpgouts = [
 mpgcodes = [v["mpg_code"] for v in mpgouts]
 
 
-class PlayerError(RuntimeError):
-    """Class for any errors encountered by the player during runtime"""
+class MPyg321PlayerError(RuntimeError):
+    """Base class for any errors encountered by the player during runtime"""
     pass
 
 
