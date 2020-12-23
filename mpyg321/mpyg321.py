@@ -38,6 +38,47 @@ class MPyg321PlayerError(RuntimeError):
     pass
 
 
+class MPyg321PlayerFileError(MPyg321PlayerError):
+    """Errors encountered by the player related to files"""
+    pass
+
+
+class MPyg321PlayerCommandError(MPyg321PlayerError):
+    """Errors encountered by the player related to player commands"""
+    pass
+
+
+class MPyg321PlayerArgumentError(MPyg321PlayerError):
+    """Errors encountered by the player related to arguments for commands"""
+    pass
+
+
+class MPyg321PlayerEQError(MPyg321PlayerError):
+    """Errors encountered by the player related to the equalizer"""
+    pass
+
+
+class MPyg321PlayerSeekError(MPyg321PlayerError):
+    """Errors encountered by the player related to the seek"""
+    pass
+
+
+mpg_errors = {
+        "Error opening stream:": MPyg321PlayerFileError,
+        "failed to parse given eq file:": MPyg321PlayerFileError,
+        "Corrupted file:": MPyg321PlayerFileError,
+        "Unknown command:": MPyg321PlayerCommandError,
+        "Unfinished command:": MPyg321PlayerCommandError,
+        "Unknown command or no arguments:": MPyg321PlayerArgumentError,
+        "invalid arguments for": MPyg321PlayerArgumentError,
+        "Missing argument to": MPyg321PlayerArgumentError,
+        "failed to set eq:": MPyg321PlayerEQError,
+        "Error while seeking": MPyg321PlayerSeekError,
+        "empty list name": MPyg321PlayerError,
+        "No track loaded!": MPyg321PlayerError
+}
+
+
 class PlayerStatus:
     INSTANCIATED = 0
     PLAYING = 1
@@ -123,7 +164,14 @@ No suitable command found. Please install mpg321 or mpg123 and try again.""")
     def handle_errors(self):
         """Handle errors encountered by the player"""
         output = self.player.readline().decode("utf-8")
-        raise PlayerError(output)
+
+        # Check error in list of errors
+        for message, error in mpg_errors.items():
+            if message in output:
+                raise error(output)
+
+        # Some other error occurred
+        raise MPyg321PlayerError(output)
 
     # # # Callbacks # # #
     def onAnyStop(self):
