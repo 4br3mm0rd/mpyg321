@@ -2,37 +2,6 @@ import pexpect
 from threading import Thread
 
 
-mpgouts = [
-    {
-        "mpg_code": "@P 0",
-        "action": "user_stop",
-        "description": "Music has been stopped by the user."
-    },
-    {
-        "mpg_code": "@P 1",
-        "action": "user_pause",
-        "description": "Music has been paused by the user."
-    },
-    {
-        "mpg_code": "@P 2",
-        "action": "user_resume",
-        "description": "Music has been resumed by the user."
-    },
-    {
-        "mpg_code": "@P 3",
-        "action": "end_of_song",
-        "description": "Player has reached the end of the song."
-    },
-    {
-        "mpg_code": "@E *",
-        "action": "error",
-        "description": "Player has encountered an error."
-    }
-]
-
-mpgcodes = [v["mpg_code"] for v in mpgouts]
-
-
 class MPyg321PlayerError(RuntimeError):
     """Base class for any errors encountered by the player during runtime"""
     pass
@@ -63,20 +32,86 @@ class MPyg321PlayerSeekError(MPyg321PlayerError):
     pass
 
 
-mpg_errors = {
-        "Error opening stream:": MPyg321PlayerFileError,
-        "failed to parse given eq file:": MPyg321PlayerFileError,
-        "Corrupted file:": MPyg321PlayerFileError,
-        "Unknown command:": MPyg321PlayerCommandError,
-        "Unfinished command:": MPyg321PlayerCommandError,
-        "Unknown command or no arguments:": MPyg321PlayerArgumentError,
-        "invalid arguments for": MPyg321PlayerArgumentError,
-        "Missing argument to": MPyg321PlayerArgumentError,
-        "failed to set eq:": MPyg321PlayerEQError,
-        "Error while seeking": MPyg321PlayerSeekError,
-        "empty list name": MPyg321PlayerError,
-        "No track loaded!": MPyg321PlayerError
-}
+mpgouts = [
+    {
+        "mpg_code": "@P 0",
+        "action": "user_stop",
+        "description": "Music has been stopped by the user."
+    },
+    {
+        "mpg_code": "@P 1",
+        "action": "user_pause",
+        "description": "Music has been paused by the user."
+    },
+    {
+        "mpg_code": "@P 2",
+        "action": "user_resume",
+        "description": "Music has been resumed by the user."
+    },
+    {
+        "mpg_code": "@P 3",
+        "action": "end_of_song",
+        "description": "Player has reached the end of the song."
+    },
+    {
+        "mpg_code": "@E *",
+        "action": "error",
+        "description": "Player has encountered an error."
+    }
+]
+
+mpgcodes = [v["mpg_code"] for v in mpgouts]
+
+mpg_errors = [
+    {
+        "message": "Error opening stream",
+        "exception": MPyg321PlayerFileError
+    },
+    {
+        "message": "failed to parse given eq file:",
+        "exception": MPyg321PlayerFileError
+    },
+    {
+        "message": "Corrupted file:",
+        "exception": MPyg321PlayerFileError
+    },
+    {
+        "message": "Unknown command:",
+        "exception": MPyg321PlayerCommandError
+    },
+    {
+        "message": "Unfinished command:",
+        "exception": MPyg321PlayerCommandError
+    },
+    {
+        "message": "Unknown command or no arguments:",
+        "exception": MPyg321PlayerArgumentError
+    },
+    {
+        "message": "invalid arguments for",
+        "exception": MPyg321PlayerArgumentError
+    },
+    {
+        "message": "Missing argument to",
+        "exception": MPyg321PlayerArgumentError
+    },
+    {
+        "message": "failed to set eq:",
+        "exception": MPyg321PlayerEQError
+    },
+    {
+        "message": "Error while seeking",
+        "exception": MPyg321PlayerSeekError
+    },
+    {
+        "message": "empty list name",
+        "exception": MPyg321PlayerError
+    },
+    {
+        "message": "No track loaded!",
+        "exception": MPyg321PlayerError
+    }
+]
 
 
 class PlayerStatus:
@@ -166,9 +201,9 @@ No suitable command found. Please install mpg321 or mpg123 and try again.""")
         output = self.player.readline().decode("utf-8")
 
         # Check error in list of errors
-        for message, error in mpg_errors.items():
-            if message in output:
-                raise error(output)
+        for error in mpgerrors:
+            if error["message"] in output:
+                raise error["exception"](output)
 
         # Some other error occurred
         raise MPyg321PlayerError(output)
