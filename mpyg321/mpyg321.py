@@ -2,7 +2,7 @@ import pexpect
 from threading import Thread
 
 
-mpgouts = [
+mpg_outs = [
     {
         "mpg_code": "@P 0",
         "action": "user_stop",
@@ -30,7 +30,7 @@ mpgouts = [
     }
 ]
 
-mpgcodes = [v["mpg_code"] for v in mpgouts]
+mpg_codes = [v["mpg_code"] for v in mpg_outs]
 
 mpg_errors = [
     {
@@ -150,21 +150,21 @@ No suitable command found. Please install mpg321 or mpg123 and try again.""")
     def process_output(self):
         """Parses the output"""
         while True:
-            index = self.player.expect(mpgcodes)
-            action = mpgouts[index]["action"]
+            index = self.player.expect(mpg_codes)
+            action = mpg_outs[index]["action"]
             if action == "user_stop":
-                self.onAnyStop()
-                self.onUserStop()
+                self.on_any_stop()
+                self.on_user_stop()
             if action == "user_pause":
-                self.onAnyStop()
-                self.onUserPause()
+                self.on_any_stop()
+                self.on_user_pause()
             if action == "user_resume":
-                self.onUserResume()
+                self.on_user_resume()
             if action == "end_of_song":
-                self.onAnyStop()
-                self.onMusicEnd()
+                self.on_any_stop()
+                self.on_music_end()
             if action == "error":
-                self.handle_errors()
+                self.process_errors()
 
     def play_song(self, path):
         """Plays the song"""
@@ -197,8 +197,8 @@ No suitable command found. Please install mpg321 or mpg123 and try again.""")
         """Jump to position"""
         self.player.sendline("JUMP " + str(pos))
 
-    def handle_errors(self):
-        """Handle errors encountered by the player"""
+    def process_errors(self):
+        """Process errors encountered by the player"""
         output = self.player.readline().decode("utf-8")
 
         # Check error in list of errors
@@ -222,22 +222,22 @@ No suitable command found. Please install mpg321 or mpg123 and try again.""")
         raise MPyg321PlayerError(output)
 
     # # # Callbacks # # #
-    def onAnyStop(self):
+    def on_any_stop(self):
         """Callback when the music stops for any reason"""
         pass
 
-    def onUserPause(self):
+    def on_user_pause(self):
         """Callback when user pauses the music"""
         pass
 
-    def onUserResume(self):
+    def on_user_resume(self):
         """Callback when user resumes the music"""
         pass
 
-    def onUserStop(self):
+    def on_user_stop(self):
         """Callback when user stops music"""
         pass
 
-    def onMusicEnd(self):
+    def on_music_end(self):
         """Callback when music ends"""
         pass
