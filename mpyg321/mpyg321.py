@@ -2,36 +2,6 @@ import pexpect
 from threading import Thread
 
 
-class MPyg321PlayerError(RuntimeError):
-    """Base class for any errors encountered by the player during runtime"""
-    pass
-
-
-class MPyg321PlayerFileError(MPyg321PlayerError):
-    """Errors encountered by the player related to files"""
-    pass
-
-
-class MPyg321PlayerCommandError(MPyg321PlayerError):
-    """Errors encountered by the player related to player commands"""
-    pass
-
-
-class MPyg321PlayerArgumentError(MPyg321PlayerError):
-    """Errors encountered by the player related to arguments for commands"""
-    pass
-
-
-class MPyg321PlayerEQError(MPyg321PlayerError):
-    """Errors encountered by the player related to the equalizer"""
-    pass
-
-
-class MPyg321PlayerSeekError(MPyg321PlayerError):
-    """Errors encountered by the player related to the seek"""
-    pass
-
-
 mpgouts = [
     {
         "mpg_code": "@P 0",
@@ -64,54 +34,85 @@ mpgcodes = [v["mpg_code"] for v in mpgouts]
 
 mpg_errors = [
     {
-        "message": "Error opening stream",
-        "exception": MPyg321PlayerFileError
-    },
-    {
-        "message": "failed to parse given eq file:",
-        "exception": MPyg321PlayerFileError
-    },
-    {
-        "message": "Corrupted file:",
-        "exception": MPyg321PlayerFileError
-    },
-    {
-        "message": "Unknown command:",
-        "exception": MPyg321PlayerCommandError
-    },
-    {
-        "message": "Unfinished command:",
-        "exception": MPyg321PlayerCommandError
-    },
-    {
-        "message": "Unknown command or no arguments:",
-        "exception": MPyg321PlayerArgumentError
-    },
-    {
-        "message": "invalid arguments for",
-        "exception": MPyg321PlayerArgumentError
-    },
-    {
-        "message": "Missing argument to",
-        "exception": MPyg321PlayerArgumentError
-    },
-    {
-        "message": "failed to set eq:",
-        "exception": MPyg321PlayerEQError
-    },
-    {
-        "message": "Error while seeking",
-        "exception": MPyg321PlayerSeekError
-    },
-    {
         "message": "empty list name",
-        "exception": MPyg321PlayerError
+        "action": "generic_error"
     },
     {
         "message": "No track loaded!",
-        "exception": MPyg321PlayerError
+        "action": "generic_error"
     }
+    {
+        "message": "Error opening stream",
+        "action": "file_error"
+    },
+    {
+        "message": "failed to parse given eq file:",
+        "action": "file_error"
+    },
+    {
+        "message": "Corrupted file:",
+        "action": "file_error"
+    },
+    {
+        "message": "Unknown command:",
+        "action": "command_error"
+    },
+    {
+        "message": "Unfinished command:",
+        "action": "command_error"
+    },
+    {
+        "message": "Unknown command or no arguments:",
+        "action": "argument_error"
+    },
+    {
+        "message": "invalid arguments for",
+        "action": "argument_error"
+    },
+    {
+        "message": "Missing argument to",
+        "action": "argument_error"
+    },
+    {
+        "message": "failed to set eq:",
+        "action": "eq_error"
+    },
+    {
+        "message": "Error while seeking",
+        "action": "seek_error"
+    },
 ]
+
+
+# # # Errors # # #
+class MPyg321PlayerError(RuntimeError):
+    """Base class for any errors encountered by the player during runtime"""
+    pass
+
+
+class MPyg321PlayerFileError(MPyg321PlayerError):
+    """Errors encountered by the player related to files"""
+    pass
+
+
+class MPyg321PlayerCommandError(MPyg321PlayerError):
+    """Errors encountered by the player related to player commands"""
+    pass
+
+
+class MPyg321PlayerArgumentError(MPyg321PlayerError):
+    """Errors encountered by the player related to arguments for commands"""
+    pass
+
+
+class MPyg321PlayerEQError(MPyg321PlayerError):
+    """Errors encountered by the player related to the equalizer"""
+    pass
+
+
+class MPyg321PlayerSeekError(MPyg321PlayerError):
+    """Errors encountered by the player related to the seek"""
+    pass
 
 
 class PlayerStatus:
@@ -133,11 +134,11 @@ class MPyg321Player:
         try:
             self.player = pexpect.spawn("mpg321 -R somerandomword",
                                         timeout=None)
-        except pexpect.exceptions.ExceptionPexpect:
+        except pexpect.actions.ExceptionPexpect:
             try:
                 self.player = pexpect.spawn("mpg123 -R somerandomword",
                                             timeout=None)
-            except pexpect.exceptions.ExceptionPexpect:
+            except pexpect.actions.ExceptionPexpect:
                 raise FileNotFoundError("""\
 No suitable command found. Please install mpg321 or mpg123 and try again.""")
 
@@ -201,9 +202,21 @@ No suitable command found. Please install mpg321 or mpg123 and try again.""")
         output = self.player.readline().decode("utf-8")
 
         # Check error in list of errors
-        for error in mpgerrors:
+        for mpg_error in mpg_errors:
             if error["message"] in output:
-                raise error["exception"](output)
+                action = error["action"]
+                if action == "generic_error":
+                    raise MPyg321PlayerError(output)
+                if action == "file_error":
+                    raise MPyg321PlayerFileError(output)
+                if action == "command_error":
+                    raise MPyg321PlayerCommandError(output)
+                if action == "argument_error":
+                    raise MPyg321PlayerArgumentError(output)
+                if action == "eq_error":
+                    raise MPyg321PlayerEQError
+                if action == "seek_error":
+                    raise MPyg321PlayerSeekError
 
         # Some other error occurred
         raise MPyg321PlayerError(output)
