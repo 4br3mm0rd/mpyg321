@@ -40,7 +40,7 @@ mpg_errors = [
     {
         "message": "No track loaded!",
         "action": "generic_error"
-    }
+    },
     {
         "message": "Error opening stream",
         "action": "file_error"
