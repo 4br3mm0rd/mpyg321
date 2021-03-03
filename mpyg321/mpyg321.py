@@ -128,6 +128,8 @@ class MPyg321Player:
     player = None
     status = None
     output_processor = None
+    song_path = ""
+    loop = False
 
     def __init__(self):
         """Builds the player and creates the callbacks"""
@@ -153,22 +155,25 @@ No suitable command found. Please install mpg321 or mpg123 and try again.""")
             index = self.player.expect(mpg_codes)
             action = mpg_outs[index]["action"]
             if action == "user_stop":
-                self.on_any_stop()
-                self.on_user_stop()
+                self.on_user_stop_int()
             if action == "user_pause":
-                self.on_any_stop()
-                self.on_user_pause()
+                self.on_user_pause_int()
             if action == "user_resume":
-                self.on_user_resume()
+                self.on_user_resume_int()
             if action == "end_of_song":
-                self.on_any_stop()
-                self.on_music_end()
+                self.on_end_of_song_int()
             if action == "error":
-                self.process_errors()
+                self.on_error()
 
-    def play_song(self, path):
+    def play_song(self, path, loop=False):
         """Plays the song"""
-        self.player.sendline("LOAD " + path)
+        self.loop = loop
+        self.set_song(path)
+        self.play()
+
+    def play(self):
+        """Starts playing the song"""
+        self.player.sendline("LOAD " + self.song_path)
         self.status = PlayerStatus.PLAYING
 
     def pause(self):
@@ -197,7 +202,7 @@ No suitable command found. Please install mpg321 or mpg123 and try again.""")
         """Jump to position"""
         self.player.sendline("JUMP " + str(pos))
 
-    def process_errors(self):
+    def on_error(self):
         """Process errors encountered by the player"""
         output = self.player.readline().decode("utf-8")
 
@@ -221,7 +226,39 @@ No suitable command found. Please install mpg321 or mpg123 and try again.""")
         # Some other error occurred
         raise MPyg321PlayerError(output)
 
-    # # # Callbacks # # #
+    def set_song(self, path):
+        """song_path setter"""
+        self.song_path = path
+
+    def set_loop(self, loop):
+        """"loop setter"""
+        self.loop = loop
+
+    # # # Internal Callbacks # # #
+    def on_user_stop_int(self):
+        """Internal callback when user stops the music"""
+        self.on_any_stop()
+        self.on_user_stop()
+
+    def on_user_pause_int(self):
+        """Internal callback when user pauses the music"""
+        self.on_any_stop()
+        self.on_user_pause()
+
+    def on_user_resume_int(self):
+        """Internal callback when user resumes the music"""
+        self.on_user_resume()
+
+    def on_end_of_song_int(self):
+        """Internal callback when the song ends"""
+        if(self.loop):
+            self.play()
+        else:
+            # The music doesn't stop if it is looped
+            self.on_any_stop()
+        self.on_music_end()
+
+    # # # Public Callbacks # # #
     def on_any_stop(self):
         """Callback when the music stops for any reason"""
         pass
