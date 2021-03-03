@@ -10,23 +10,23 @@ from time import sleep
 class MyPlayer(MPyg321Player):
     """We create a class extending the basic player to implement callbacks"""
 
-    def onAnyStop(self):
+    def on_any_stop(self):
         """Callback when the music stops for any reason"""
         print("The music has stopped")
 
-    def onUserPause(self):
+    def on_user_pause(self):
         """Callback when user pauses the music"""
         print("The music has paused")
 
-    def onUserResume(self):
+    def on_user_resume(self):
         """Callback when user resumes the music"""
         print("The music has resumed")
 
-    def onUserStop(self):
+    def on_user_stop(self):
         """Callback when user stops music"""
         print("The music has stopped (by user)")
 
-    def onMusicEnd(self):
+    def on_music_end(self):
         """Callback when music ends"""
         print("The music has ended")
 
