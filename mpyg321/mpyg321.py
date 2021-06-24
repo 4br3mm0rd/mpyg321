@@ -208,8 +208,8 @@ No suitable command found. Please install mpg321 or mpg123 and try again.""")
 
         # Check error in list of errors
         for mpg_error in mpg_errors:
-            if error["message"] in output:
-                action = error["action"]
+            if mpg_error["message"] in output:
+                action = mpg_error["action"]
                 if action == "generic_error":
                     raise MPyg321PlayerError(output)
                 if action == "file_error":
