@@ -136,11 +136,11 @@ class MPyg321Player:
         try:
             self.player = pexpect.spawn("mpg321 -R somerandomword",
                                         timeout=None)
-        except pexpect.actions.ExceptionPexpect:
+        except pexpect.exceptions.ExceptionPexpect:
             try:
                 self.player = pexpect.spawn("mpg123 -R somerandomword",
                                             timeout=None)
-            except pexpect.actions.ExceptionPexpect:
+            except pexpect.exceptions.ExceptionPexpect:
                 raise FileNotFoundError("""\
 No suitable command found. Please install mpg321 or mpg123 and try again.""")
 
