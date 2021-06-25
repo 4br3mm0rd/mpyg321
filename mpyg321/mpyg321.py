@@ -227,6 +227,11 @@ No suitable command found. Please install mpg321 or mpg123 and try again.""")
         """Silences the player"""
         self.player.sendline("SILENCE")
 
+    def load_list(self, entry, url):
+        """Load an entry in a list"""
+        self.player.sendline("LOADLIST {} {}".format(entry, url))
+        self.status = PlayerStatus.PLAYING
+
     def on_error(self):
         """Process errors encountered by the player"""
         output = self.player.readline().decode("utf-8")
