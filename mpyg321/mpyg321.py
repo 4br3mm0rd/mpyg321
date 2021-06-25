@@ -136,14 +136,15 @@ class MPyg321Player:
     song_path = ""
     loop = False
 
-    def __init__(self):
+    def __init__(self, **kwoptions):
         """Builds the player and creates the callbacks"""
+        options = self.build_options(kwoptions)
         try:
-            self.player = pexpect.spawn("mpg321 -R somerandomword",
+            self.player = pexpect.spawn("mpg321 " + options,
                                         timeout=None)
         except pexpect.exceptions.ExceptionPexpect:
             try:
-                self.player = pexpect.spawn("mpg123 -R somerandomword",
+                self.player = pexpect.spawn("mpg123 " + options,
                                             timeout=None)
             except pexpect.exceptions.ExceptionPexpect:
                 raise FileNotFoundError("""\
@@ -172,6 +173,14 @@ No suitable command found. Please install mpg321 or mpg123 and try again.""")
                 self.on_error()
             if action == "user_silence":
                 self.on_silence()
+
+    def build_options(self, kwoptions):
+        """Build options"""
+        options = ["--remote"]
+        if 'audiodevice' in kwoptions:
+            options.append("--audiodevice")
+            options.append(kwoptions['audiodevice'])
+        return " ".join(options)
 
     def play_song(self, path, loop=False):
         """Plays the song"""
