@@ -27,7 +27,12 @@ mpg_outs = [
         "mpg_code": "@E *",
         "action": "error",
         "description": "Player has encountered an error."
-    }
+    },
+    {
+        "mpg_code": "@silence",
+        "action": "user_silence",
+        "description": "Player has been silenced by the user."
+    },
 ]
 
 mpg_codes = [v["mpg_code"] for v in mpg_outs]
@@ -144,6 +149,7 @@ class MPyg321Player:
                 raise FileNotFoundError("""\
 No suitable command found. Please install mpg321 or mpg123 and try again.""")
 
+        self.player.delaybeforesend = None
         self.status = PlayerStatus.INSTANCIATED
         self.output_processor = Thread(target=self.process_output)
         self.output_processor.daemon = True
@@ -164,6 +170,8 @@ No suitable command found. Please install mpg321 or mpg123 and try again.""")
                 self.on_end_of_song_int()
             if action == "error":
                 self.on_error()
+            if action == "user_silence":
+                self.on_silence()
 
     def play_song(self, path, loop=False):
         """Plays the song"""
@@ -201,6 +209,14 @@ No suitable command found. Please install mpg321 or mpg123 and try again.""")
     def jump(self, pos):
         """Jump to position"""
         self.player.sendline("JUMP " + str(pos))
+
+    def volume(self, percent):
+        """Adjust player's volume"""
+        self.player.sendline("VOLUME {}".format(percent))
+
+    def silence(self):
+        """Silences the player"""
+        self.player.sendline("SILENCE")
 
     def on_error(self):
         """Process errors encountered by the player"""
@@ -277,4 +293,8 @@ No suitable command found. Please install mpg321 or mpg123 and try again.""")
 
     def on_music_end(self):
         """Callback when music ends"""
+        pass
+
+    def on_silence(self):
+        """Callback when user silence the player"""
         pass
