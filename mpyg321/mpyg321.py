@@ -176,7 +176,7 @@ No suitable command found. Please install mpg321 or mpg123 and try again.""")
 
     def build_options(self, kwoptions):
         """Build options"""
-        options = ["--remote"]
+        options = ["-R"]
         if 'audiodevice' in kwoptions:
             options.append("--audiodevice")
             options.append(kwoptions['audiodevice'])
