@@ -1,6 +1,8 @@
 import pexpect
 from threading import Thread
 
+from pexpect import exceptions
+
 
 mpg_outs = [
     {
@@ -83,35 +85,48 @@ mpg_errors = [
     },
 ]
 
+suitable_versions = ["mpg123", "mpg321"]
+
 
 # # # Errors # # #
-class MPyg321PlayerError(RuntimeError):
+class MPyg321Error(RuntimeError):
     """Base class for any errors encountered by the player during runtime"""
     pass
 
 
-class MPyg321PlayerFileError(MPyg321PlayerError):
+class MPyg321FileError(MPyg321Error):
     """Errors encountered by the player related to files"""
     pass
 
 
-class MPyg321PlayerCommandError(MPyg321PlayerError):
+class MPyg321CommandError(MPyg321Error):
     """Errors encountered by the player related to player commands"""
     pass
 
 
-class MPyg321PlayerArgumentError(MPyg321PlayerError):
+class MPyg321ArgumentError(MPyg321Error):
     """Errors encountered by the player related to arguments for commands"""
     pass
 
 
-class MPyg321PlayerEQError(MPyg321PlayerError):
+class MPyg321EQError(MPyg321Error):
     """Errors encountered by the player related to the equalizer"""
     pass
 
 
-class MPyg321PlayerSeekError(MPyg321PlayerError):
+class MPyg321SeekError(MPyg321Error):
     """Errors encountered by the player related to the seek"""
+    pass
+
+
+class MPyg321WrongPlayerPathError(MPyg321Error):
+    """Errors encountered when a wrong player path is provided in the
+    constructor"""
+    pass
+
+
+class MPyg321NoPlayerFoundError(MPyg321Error):
+    """Errors encountered when no suitable player is found"""
     pass
 
 
@@ -126,28 +141,56 @@ class PlayerStatus:
 class MPyg321Player:
     """Main class for mpg321 player management"""
     player = None
+    player_version = "mpg321"
     status = None
     output_processor = None
     song_path = ""
     loop = False
 
-    def __init__(self):
+    def __init__(self, player=None):
         """Builds the player and creates the callbacks"""
-        try:
-            self.player = pexpect.spawn("mpg321 -R somerandomword",
-                                        timeout=None)
-        except pexpect.exceptions.ExceptionPexpect:
-            try:
-                self.player = pexpect.spawn("mpg123 -R somerandomword",
-                                            timeout=None)
-            except pexpect.exceptions.ExceptionPexpect:
-                raise FileNotFoundError("""\
-No suitable command found. Please install mpg321 or mpg123 and try again.""")
-
-        self.status = PlayerStatus.INSTANCIATED
+        self.set_player(player)
         self.output_processor = Thread(target=self.process_output)
         self.output_processor.daemon = True
         self.output_processor.start()
+
+    def set_version_and_get_player(self, player):
+        """Gets the player """
+        version_process = None
+        valid_player = None
+        if player is not None:
+            try:
+                version_process = pexpect.spawn(str(player) + " --version")
+                valid_player = str(player)
+            except pexpect.exceptions.ExceptionPexpect:
+                raise MPyg321WrongPlayerPathError(
+                    """Invalid file path provided""")
+
+        else:
+            try:
+                version_process = pexpect.spawn("mpg123 ---version")
+                valid_player = "mpg123"
+            except pexpect.exceptions.ExceptionPexpect:
+                try:
+                    version_process = pexpect.spawn("mpg321 --version")
+                    valid_player = "mpg321"
+                except pexpect.exceptions.ExceptionPexpect:
+                    raise MPyg321NoPlayerFoundError(
+                        """No suitable player found""")
+
+        index = version_process.expect(suitable_versions)
+        try:
+            self.player_version = suitable_versions[index]
+        except IndexError:
+            raise MPyg321NoPlayerFoundError("""No suitable player found""")
+        return valid_player
+
+    def set_player(self, player):
+        """Sets the player"""
+        player = self.set_version_and_get_player(player)
+        args = "--remote" if self.player_version == "mpg123" else "-R test"
+        self.player = pexpect.spawn(str(player) + " " + args)
+        self.status = PlayerStatus.INSTANCIATED
 
     def process_output(self):
         """Parses the output"""
@@ -211,20 +254,20 @@ No suitable command found. Please install mpg321 or mpg123 and try again.""")
             if mpg_error["message"] in output:
                 action = mpg_error["action"]
                 if action == "generic_error":
-                    raise MPyg321PlayerError(output)
+                    raise MPyg321Error(output)
                 if action == "file_error":
-                    raise MPyg321PlayerFileError(output)
+                    raise MPyg321FileError(output)
                 if action == "command_error":
-                    raise MPyg321PlayerCommandError(output)
+                    raise MPyg321CommandError(output)
                 if action == "argument_error":
-                    raise MPyg321PlayerArgumentError(output)
+                    raise MPyg321ArgumentError(output)
                 if action == "eq_error":
-                    raise MPyg321PlayerEQError
+                    raise MPyg321EQError
                 if action == "seek_error":
-                    raise MPyg321PlayerSeekError
+                    raise MPyg321SeekError
 
         # Some other error occurred
-        raise MPyg321PlayerError(output)
+        raise MPyg321Error(output)
 
     def set_song(self, path):
         """song_path setter"""
