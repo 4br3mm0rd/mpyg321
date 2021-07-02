@@ -7,8 +7,9 @@ from pexpect import exceptions
 mpg_outs = [
     {
         "mpg_code": "@P 0",
-        "action": "user_stop",
-        "description": "Music has been stopped by the user."
+        "action": "music_stop",
+        "description": """For mpg123, it corresponds to any stop
+                        For mpg312 it corresponds to user stop only"""
     },
     {
         "mpg_code": "@P 1",
@@ -17,8 +18,8 @@ mpg_outs = [
     },
     {
         "mpg_code": "@P 2",
-        "action": "user_resume",
-        "description": "Music has been resumed by the user."
+        "action": "user_start_or_resume",
+        "description": "Music has been started resumed by the user."
     },
     {
         "mpg_code": "@P 3",
@@ -134,14 +135,16 @@ class PlayerStatus:
     INSTANCIATED = 0
     PLAYING = 1
     PAUSED = 2
-    STOPPED = 3
-    QUITTED = 4
+    RESUMING = 3
+    STOPPING = 4
+    STOPPED = 5
+    QUITTED = 6
 
 
 class MPyg321Player:
     """Main class for mpg321 player management"""
     player = None
-    player_version = "mpg321"
+    player_version = "mpg123"
     status = None
     output_processor = None
     song_path = ""
@@ -197,12 +200,12 @@ class MPyg321Player:
         while True:
             index = self.player.expect(mpg_codes)
             action = mpg_outs[index]["action"]
-            if action == "user_stop":
-                self.on_user_stop_int()
+            if action == "music_stop":
+                self.on_music_stop_int()
             if action == "user_pause":
                 self.on_user_pause_int()
-            if action == "user_resume":
-                self.on_user_resume_int()
+            if action == "user_start_or_resume":
+                self.on_user_start_or_resume_int()
             if action == "end_of_song":
                 self.on_end_of_song_int()
             if action == "error":
@@ -229,12 +232,15 @@ class MPyg321Player:
         """Resume the player"""
         if self.status == PlayerStatus.PAUSED:
             self.player.sendline("PAUSE")
-            self.status = PlayerStatus.PLAYING
+            self.on_user_resume()
 
     def stop(self):
         """Stops the player"""
         self.player.sendline("STOP")
-        self.status = PlayerStatus.STOPPED
+        if self.player_version == "mpg321":
+            self.status = PlayerStatus.STOPPED
+        else:
+            self.status = PlayerStatus.STOPPING
 
     def quit(self):
         """Quits the player"""
@@ -278,8 +284,21 @@ class MPyg321Player:
         self.loop = loop
 
     # # # Internal Callbacks # # #
-    def on_user_stop_int(self):
+    def on_music_stop_int(self):
         """Internal callback when user stops the music"""
+        if self.player_version == "mpg123":
+            if self.status == PlayerStatus.STOPPING:
+                self.status = PlayerStatus.STOPPED
+                self.on_user_stop_int()
+            else:
+                # If not stopped by the user, it is the end of the song
+                # the on_any_stop function is called inside on_end_of_song_int
+                self.on_end_of_song_int()
+        else:
+            self.on_user_stop_int()
+
+    def on_user_stop_int(self):
+        """Internal callback when the user stops the music."""
         self.on_any_stop()
         self.on_user_stop()
 
@@ -288,9 +307,9 @@ class MPyg321Player:
         self.on_any_stop()
         self.on_user_pause()
 
-    def on_user_resume_int(self):
+    def on_user_start_or_resume_int(self):
         """Internal callback when user resumes the music"""
-        self.on_user_resume()
+        self.status = PlayerStatus.PLAYING
 
     def on_end_of_song_int(self):
         """Internal callback when the song ends"""
