@@ -192,8 +192,7 @@ class MPyg321Player:
         """Sets the player"""
         player = self.set_version_and_get_player(player)
         args = "--remote" if self.player_version == "mpg123" else "-R test"
-        if audiodevice:
-            args += " --audiodevice " + audiodevice
+        args += " --audiodevice " + audiodevice if audiodevice else ""
         self.player = pexpect.spawn(str(player) + " " + args)
         self.status = PlayerStatus.INSTANCIATED
 
