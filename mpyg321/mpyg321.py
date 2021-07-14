@@ -252,6 +252,11 @@ class MPyg321Player:
         """Jump to position"""
         self.player.sendline("JUMP " + str(pos))
 
+    def load_list(self, entry, filepath):
+        """Load an entry in a list"""
+        self.player.sendline("LOADLIST {} {}".format(entry, filepath))
+        self.status = PlayerStatus.PLAYING
+
     def on_error(self):
         """Process errors encountered by the player"""
         output = self.player.readline().decode("utf-8")
