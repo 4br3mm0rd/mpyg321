@@ -1,4 +1,5 @@
 import pexpect
+import sys
 from threading import Thread
 
 from pexpect import exceptions
@@ -30,7 +31,47 @@ mpg_outs = [
         "mpg_code": "@E *",
         "action": "error",
         "description": "Player has encountered an error."
-    }
+    },
+    {
+        "mpg_code": "@silence",
+        "action": "user_silence",
+        "description": "Player has been silenced by the user."
+    },
+    {
+        "mpg_code": "@V *",
+        "action": "volume_change",
+        "description": "Volume change event."
+    },
+    {
+        "mpg_code": "@VOLUME *",
+        "action": "volume_change",
+        "description": "Volume change event."
+    },
+    {
+        "mpg_code": "@LOADLIST *",
+        "action": "load_list",
+        "description": "Load list event."
+    },
+    {
+        "mpg_code": "@LL *",
+        "action": "load_list",
+        "description": "Load list event."
+    },
+    {
+        "mpg_code": "@S *",
+        "action": "pass",
+        "description": "Ignore event."
+    },
+    {
+        "mpg_code": "\r\n",
+        "action": "pass",
+        "description": "Ignore event."
+    },
+    {
+        "mpg_code": "",
+        "action": "pass",
+        "description": "Ignore event."
+    },
 ]
 
 mpg_codes = [v["mpg_code"] for v in mpg_outs]
@@ -194,6 +235,8 @@ class MPyg321Player:
         args = "--remote" if self.player_version == "mpg123" else "-R test"
         args += " --audiodevice " + audiodevice if audiodevice else ""
         self.player = pexpect.spawn(str(player) + " " + args)
+        self.player.logfile_read = sys.stdout
+        if self.player_version == "mpg123": self.player.delaybeforesend = None
         self.status = PlayerStatus.INSTANCIATED
 
     def process_output(self):
@@ -251,6 +294,11 @@ class MPyg321Player:
     def jump(self, pos):
         """Jump to position"""
         self.player.sendline("JUMP " + str(pos))
+
+    def volume(self, percent):
+        """Adjust player's volume"""
+        if self.player_version == "mpg123":
+            self.player.sendline("VOLUME {}".format(percent))
 
     def silence(self):
         """Silences the player"""
