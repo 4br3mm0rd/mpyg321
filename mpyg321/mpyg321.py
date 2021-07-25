@@ -238,10 +238,6 @@ class MPyg321Player:
                 self.on_end_of_song_int()
             if action == "error":
                 self.on_error()
-            if action == "timeout":
-                if self.player.before and self.player.after:
-                    print("Before: " + str(self.player.before))
-                    print("After : " + str(self.player.after))
 
     def play_song(self, path, loop=False):
         """Plays the song"""
