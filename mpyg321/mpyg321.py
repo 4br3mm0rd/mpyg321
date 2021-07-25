@@ -3,7 +3,7 @@ import sys
 from threading import Thread
 
 from pexpect import exceptions
-
+import time
 
 mpg_outs = [
     {
@@ -34,43 +34,28 @@ mpg_outs = [
     },
     {
         "mpg_code": "@silence",
-        "action": "user_silence",
+        "action": None,
         "description": "Player has been silenced by the user."
     },
     {
-        "mpg_code": "@V *",
-        "action": "volume_change",
-        "description": "Volume change event."
+        "mpg_code": "@V [0-9\.\s%]*",
+        "action": None,
+        "description": "Volume change event.",
     },
     {
-        "mpg_code": "@VOLUME *",
-        "action": "volume_change",
-        "description": "Volume change event."
+        "mpg_code": "@S [a-zA-Z0-9\.\s-]*",
+        "action": None,
+        "description": "Stereo info event."
     },
     {
-        "mpg_code": "@LOADLIST *",
-        "action": "load_list",
-        "description": "Load list event."
+        "mpg_code": "@I *",
+        "action": None,
+        "description": "Information event."
     },
     {
-        "mpg_code": "@LL *",
-        "action": "load_list",
-        "description": "Load list event."
-    },
-    {
-        "mpg_code": "@S *",
-        "action": "pass",
-        "description": "Ignore event."
-    },
-    {
-        "mpg_code": "\r\n",
-        "action": "pass",
-        "description": "Ignore event."
-    },
-    {
-        "mpg_code": "",
-        "action": "pass",
-        "description": "Ignore event."
+        "mpg_code": pexpect.TIMEOUT,
+        "action": None,
+        "description": "Timeout event."
     },
 ]
 
@@ -235,7 +220,6 @@ class MPyg321Player:
         args = "--remote" if self.player_version == "mpg123" else "-R test"
         args += " --audiodevice " + audiodevice if audiodevice else ""
         self.player = pexpect.spawn(str(player) + " " + args)
-        self.player.logfile_read = sys.stdout
         if self.player_version == "mpg123": self.player.delaybeforesend = None
         self.status = PlayerStatus.INSTANCIATED
 
@@ -254,6 +238,10 @@ class MPyg321Player:
                 self.on_end_of_song_int()
             if action == "error":
                 self.on_error()
+            if action == "timeout":
+                if self.player.before and self.player.after:
+                    print("Before: " + str(self.player.before))
+                    print("After : " + str(self.player.after))
 
     def play_song(self, path, loop=False):
         """Plays the song"""
