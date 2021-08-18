@@ -3,4 +3,7 @@ __pycache__
 dist
 build
 mpyg321.egg-info
-examples/sample.mp3
+examples/*.mp3
+examples/mpyg321
+examples/tests.py
+examples/*.txt

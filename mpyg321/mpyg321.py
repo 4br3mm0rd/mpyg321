@@ -38,12 +38,12 @@ mpg_outs = [
         "description": "Player has been silenced by the user."
     },
     {
-        "mpg_code": "@V [0-9\.\s%]*",
+        "mpg_code": r"@V [0-9\.\s%]*",
         "action": None,
         "description": "Volume change event.",
     },
     {
-        "mpg_code": "@S [a-zA-Z0-9\.\s-]*",
+        "mpg_code": r"@S [a-zA-Z0-9\.\s-]*",
         "action": None,
         "description": "Stereo info event."
     },
@@ -220,7 +220,8 @@ class MPyg321Player:
         args = "--remote" if self.player_version == "mpg123" else "-R test"
         args += " --audiodevice " + audiodevice if audiodevice else ""
         self.player = pexpect.spawn(str(player) + " " + args)
-        if self.player_version == "mpg123": self.player.delaybeforesend = None
+        if self.player_version == "mpg123":
+            self.player.delaybeforesend = None
         self.status = PlayerStatus.INSTANCIATED
 
     def process_output(self):
@@ -286,7 +287,8 @@ class MPyg321Player:
 
     def silence(self):
         """Silences the player"""
-        if self.player_version == "mpg123": self.player.sendline("SILENCE")
+        if self.player_version == "mpg123":
+            self.player.sendline("SILENCE")
 
     def load_list(self, entry, filepath):
         """Load an entry in a list"""
