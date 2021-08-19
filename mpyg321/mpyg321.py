@@ -175,13 +175,16 @@ class MPyg321Player:
     output_processor = None
     song_path = ""
     loop = False
+    performance_mode = True
 
-    def __init__(self, player=None, audiodevice=None):
+    def __init__(self, player=None, audiodevice=None, performance_mode=True):
         """Builds the player and creates the callbacks"""
         self.set_player(player, audiodevice)
         self.output_processor = Thread(target=self.process_output)
         self.output_processor.daemon = True
+        self.performance_mode = performance_mode
         self.output_processor.start()
+        self.silence_mpyg_output()
 
     def set_version_and_get_player(self, player):
         """Gets the player """
@@ -220,8 +223,7 @@ class MPyg321Player:
         args = "--remote" if self.player_version == "mpg123" else "-R test"
         args += " --audiodevice " + audiodevice if audiodevice else ""
         self.player = pexpect.spawn(str(player) + " " + args)
-        if self.player_version == "mpg123":
-            self.player.delaybeforesend = None
+        self.player.delaybeforesend = None
         self.status = PlayerStatus.INSTANCIATED
 
     def process_output(self):
@@ -285,13 +287,17 @@ class MPyg321Player:
         if self.player_version == "mpg123":
             self.player.sendline("VOLUME {}".format(percent))
 
-    def silence(self):
-        """Silences the player"""
-        if self.player_version == "mpg123":
+    def silence_mpyg_output(self):
+        """Improves performance by silencing the mpg123 process frame output"""
+        if self.player_version == "mpg123" and not self.performance_mode:
             self.player.sendline("SILENCE")
 
     def load_list(self, entry, filepath):
-        """Load an entry in a list"""
+        """Load an entry in a list
+        Parameters:
+        entry (int): index of the song in the list - first is 0
+        filepath: URL/Path to the list
+        """
         if self.player_version == "mpg123":
             self.player.sendline("LOADLIST {} {}".format(entry, filepath))
             self.status = PlayerStatus.PLAYING
