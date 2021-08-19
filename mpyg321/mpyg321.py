@@ -286,6 +286,8 @@ class MPyg321Player:
         """Adjust player's volume"""
         if self.player_version == "mpg123":
             self.player.sendline("VOLUME {}".format(percent))
+        if self.player_version == "mpg321":
+            self.player.sendline("GAIN {}".format(percent))
 
     def silence_mpyg_output(self):
         """Improves performance by silencing the mpg123 process frame output"""
