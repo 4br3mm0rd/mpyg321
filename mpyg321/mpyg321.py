@@ -291,11 +291,13 @@ class MPyg321Player:
 
     def mute(self):
         """Mutes the player"""
-        self.player.sendline("MUTE")
+        if self.player_version == "mpg123":
+            self.player.sendline("MUTE")
 
     def unmute(self):
         """Unmutes the player"""
-        self.player.sendline("UNMUTE")
+        if self.player_version == "mpg123":
+            self.player.sendline("UNMUTE")
 
     def silence_mpyg_output(self):
         """Improves performance by silencing the mpg123 process frame output"""
