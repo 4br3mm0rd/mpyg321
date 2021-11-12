@@ -289,6 +289,10 @@ class MPyg321Player:
         if self.player_version == "mpg321":
             self.player.sendline("GAIN {}".format(percent))
 
+    def mute(self):
+        """Mutes the player"""
+        self.player.sendline("MUTE")
+
     def silence_mpyg_output(self):
         """Improves performance by silencing the mpg123 process frame output"""
         if self.player_version == "mpg123" and not self.performance_mode:
