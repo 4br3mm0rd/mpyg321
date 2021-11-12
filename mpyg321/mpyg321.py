@@ -57,6 +57,16 @@ mpg_outs = [
         "action": None,
         "description": "Timeout event."
     },
+    {
+        "mpg_code": "@mute",
+        "action": "on_user_mute",
+        "description": "Player has been muted by the user."
+    },
+    {
+        "mpg_code": "@unmute",
+        "action": "on_user_unmute",
+        "description": "Player has been unmuted by the user."
+    },
 ]
 
 mpg_codes = [v["mpg_code"] for v in mpg_outs]
