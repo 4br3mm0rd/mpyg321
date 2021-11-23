@@ -59,12 +59,12 @@ mpg_outs = [
     },
     {
         "mpg_code": "@mute",
-        "action": "on_user_mute",
+        "action": "user_mute",
         "description": "Player has been muted by the user."
     },
     {
         "mpg_code": "@unmute",
-        "action": "on_user_unmute",
+        "action": "user_unmute",
         "description": "Player has been unmuted by the user."
     },
 ]
@@ -249,6 +249,10 @@ class MPyg321Player:
                 self.on_user_start_or_resume_int()
             if action == "end_of_song":
                 self.on_end_of_song_int()
+            if action == "user_mute":
+                self.on_user_mute()
+            if action == "user_unmute":
+                self.on_user_unmute()
             if action == "error":
                 self.on_error()
 
