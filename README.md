@@ -1,3 +1,6 @@
+[![Downloads](https://pepy.tech/badge/mpyg321)](https://pepy.tech/project/mpyg321)
+[![Downloads](https://pepy.tech/badge/mpyg321/month)](https://pepy.tech/project/mpyg321)
+[![Downloads](https://pepy.tech/badge/mpyg321/week)](https://pepy.tech/project/mpyg321)
 # mpyg321
 
 mpyg321 is a simple python wrapper for mpg321 and mpg123. It allows you to easily play mp3 sounds in python, do basic operations on the music and implement callbacks for events like the end of a sound.
