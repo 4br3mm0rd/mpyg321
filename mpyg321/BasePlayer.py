@@ -78,10 +78,6 @@ player (Mpyg321Player or Mpyg123Player)""")
                 self.on_user_start_or_resume_int()
             elif action == "end_of_song":
                 self.on_end_of_song_int()
-            elif action == "user_mute":
-                self.on_user_mute()
-            elif action == "user_unmute":
-                self.on_user_unmute()
             elif action == "error":
                 self.on_error()
             else:
