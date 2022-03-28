@@ -17,11 +17,6 @@ mpg_outs = [
         "description": "Music has been started resumed by the user."
     },
     {
-        "mpg_code": "@P 3",
-        "action": "end_of_song",
-        "description": "Player has reached the end of the song."
-    },
-    {
         "mpg_code": "@E *",
         "action": "error",
         "description": "Player has encountered an error."
@@ -50,20 +45,30 @@ mpg_outs = [
         "mpg_code": pexpectTIMEOUT,
         "action": None,
         "description": "Timeout event."
-    },
-    {
-        "mpg_code": "@mute",
-        "action": "user_mute",
-        "description": "Player has been muted by the user."
-    },
-    {
-        "mpg_code": "@unmute",
-        "action": "user_unmute",
-        "description": "Player has been unmuted by the user."
-    },
+    }
 ]
 
-mpg_codes = [v["mpg_code"] for v in mpg_outs]
+mpg_outs_ext = {
+    "mpg123": [
+        {
+            "mpg_code": "@mute",
+            "action": "user_mute",
+            "description": "Player has been muted by the user."
+        },
+        {
+            "mpg_code": "@unmute",
+            "action": "user_unmute",
+            "description": "Player has been unmuted by the user."
+        }
+    ],
+    "mpg321": [
+        {
+            "mpg_code": "@P 3",
+            "action": "end_of_song",
+            "description": "Player has reached the end of the song."
+        }
+    ]
+}
 
 mpg_errors = [
     {
