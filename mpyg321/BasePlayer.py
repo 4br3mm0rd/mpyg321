@@ -19,8 +19,10 @@ class BasePlayer:
     song_path = ""
     loop = False
     performance_mode = True
-    suitable_versions = []
-    default_player = ""
+    suitable_versions = []      # mpg123 and/or mpg321 - set inside subclass
+    default_player = ""         # mpg123 or mpg321 - set inside subclass
+    player_version = ""         # defined inside check_player
+    mpg_outs = []
 
     def __init__(self, player=None, audiodevice=None, performance_mode=True):
         """Builds the player and creates the callbacks"""
@@ -38,7 +40,8 @@ class BasePlayer:
         try:
             cmd = str(player) + " --version"
             version_process = pexpect.spawn(cmd, timeout=5)
-            version_process.expect(self.suitable_versions)
+            index = version_process.expect(self.suitable_versions)
+            self.player_version = self.suitable_versions[index]
         except pexpect.exceptions.ExceptionPexpect:
             raise MPygPlayerNotFoundError(
                 """No suitable player found""")
@@ -51,26 +54,36 @@ class BasePlayer:
         self.player = pexpect.spawn(str(player) + " " + args)
         self.player.delaybeforesend = None
         self.status = PlayerStatus.INSTANCIATED
+        # Setting extended mpg_outs for version specific behaviors
+        self.mpg_outs = mpg_outs.copy()
+        self.mpg_outs.extend(mpg_outs_ext[self.player_version])
 
     def process_output(self):
         """Parses the output"""
+        mpg_codes = [v["mpg_code"] for v in self.mpg_outs]
         while True:
             index = self.player.expect(mpg_codes)
-            action = mpg_outs[index]["action"]
+            action = self.mpg_outs[index]["action"]
             if action == "music_stop":
                 self.on_music_stop_int()
-            if action == "user_pause":
+            elif action == "user_pause":
                 self.on_user_pause_int()
-            if action == "user_start_or_resume":
+            elif action == "user_start_or_resume":
                 self.on_user_start_or_resume_int()
-            if action == "end_of_song":
+            elif action == "end_of_song":
                 self.on_end_of_song_int()
-            if action == "user_mute":
+            elif action == "user_mute":
                 self.on_user_mute()
-            if action == "user_unmute":
+            elif action == "user_unmute":
                 self.on_user_unmute()
-            if action == "error":
+            elif action == "error":
                 self.on_error()
+            else:
+                self.process_output_ext(action)
+
+    def process_output_ext(self, action):
+        """Processes the output for version specific behavior"""
+        pass
 
     def play_song(self, path, loop=False):
         """Plays the song"""
