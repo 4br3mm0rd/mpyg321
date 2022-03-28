@@ -6,9 +6,10 @@ All the players implement this base class and add their
 specific feature.
 """
 import pexpect
+import subprocess
 from threading import Thread
-from MpygError import *
-from consts import *
+from .MpygError import *
+from .consts import *
 
 
 class BasePlayer:
@@ -19,9 +20,9 @@ class BasePlayer:
     song_path = ""
     loop = False
     performance_mode = True
-    suitable_versions = []      # mpg123 and/or mpg321 - set inside subclass
-    default_player = ""         # mpg123 or mpg321 - set inside subclass
-    player_version = ""         # defined inside check_player
+    suitable_versions = []        # mpg123 and/or mpg321 - set inside subclass
+    default_player = None         # mpg123 or mpg321 - set inside subclass
+    player_version = None         # defined inside check_player
     mpg_outs = []
 
     def __init__(self, player=None, audiodevice=None, performance_mode=True):
@@ -33,21 +34,26 @@ class BasePlayer:
         self.output_processor.start()
 
     def check_player(self, player):
-        """Gets the player """
-        version_process = None
-        if player is None:
-            player = self.default_player
+        """Gets the player"""
         try:
-            cmd = str(player) + " --version"
-            version_process = pexpect.spawn(cmd, timeout=5)
-            index = version_process.expect(self.suitable_versions)
-            self.player_version = self.suitable_versions[index]
-        except pexpect.exceptions.ExceptionPexpect:
+            cmd = str(player)
+            output = subprocess.check_output([cmd, "--version"])
+            for version in self.suitable_versions:
+                if version in str(output):
+                    self.player_version = version
+            if self.player_version is None:
+                raise MPygPlayerNotFoundError(
+                    """No suitable player found: you might be using the wrong \
+player (Mpyg321Player or Mpyg123Player)""")
+        except subprocess.SubprocessError:
             raise MPygPlayerNotFoundError(
-                """No suitable player found""")
+                """No suitable player found: you might need to install
+                mpg123""")
 
     def set_player(self, player, audiodevice):
         """Sets the player"""
+        if player is None:
+            player = self.default_player
         self.check_player(player)
         args = " --audiodevice " + audiodevice if audiodevice else ""
         args += "-R mpyg"
