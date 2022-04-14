@@ -13,6 +13,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/4br3mm0rd/mpyg321",
     packages=setuptools.find_packages(),
+    install_requires=["pexpect"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
