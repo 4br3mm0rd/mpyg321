@@ -6,12 +6,11 @@ You need to add a "sample.mp3" file in the working directory
 In this example, you can replace MPyg321Player by MPyg123Player
 according to the player you installed on your machine (mpg321/mpg123)
 """
-from mpyg321.MPyg123Player import MPyg123Player
-
+from mpyg321.MPyg321Player import MPyg321Player
 from time import sleep
 
 
-class MyPlayer(MPyg123Player):
+class MyPlayer(MPyg321Player):
     """We create a class extending the basic player to implement callbacks"""
 
     def on_any_stop(self):
@@ -34,14 +33,6 @@ class MyPlayer(MPyg123Player):
         """Callback when music ends"""
         print("The music has ended")
 
-    def on_user_mute(self):
-        """Callback when music is muted"""
-        print("The music has been muted (continues playing)")
-
-    def on_user_unmute(self):
-        """Callback when music is unmuted"""
-        print("Music has been unmuted")
-
 
 def do_some_play_pause(player):
     """Does some play and pause"""
@@ -54,10 +45,6 @@ def do_some_play_pause(player):
     player.stop()
     sleep(2)
     player.play()
-    sleep(2)
-    player.mute()
-    sleep(1)
-    player.unmute()
     sleep(20)
     player.quit()
 
