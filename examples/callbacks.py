@@ -7,6 +7,7 @@ In this example, you can replace MPyg321Player by MPyg123Player
 according to the player you installed on your machine (mpg321/mpg123)
 """
 from mpyg321.MPyg123Player import MPyg123Player
+
 from time import sleep
 
 

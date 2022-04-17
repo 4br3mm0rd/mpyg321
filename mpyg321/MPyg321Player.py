@@ -8,6 +8,7 @@ class MPyg321Player(BasePlayer):
         self.default_player = "mpg321"
         super().__init__(player, audiodevice, performance_mode)
 
+
     def process_output_ext(self, action):
         """
         Processes specific output for mpg321 player
