@@ -204,15 +204,7 @@ player (Mpyg321Player or Mpyg123Player)""")
     def on_user_stop(self):
         """Callback when user stops music"""
         pass
-
-    def on_user_mute(self):
-        """Callback when user mutes player"""
-        pass
-
-    def on_user_unmute(self):
-        """Callback when user unmutes player"""
-        pass
-
+ 
     def on_music_end(self):
         """Callback when music ends"""
         pass
