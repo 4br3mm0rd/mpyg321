@@ -8,7 +8,7 @@ class MPyg321Player(BasePlayer):
         self.default_player = "mpg321"
         super().__init__(player, audiodevice, performance_mode)
 
-    def output_process_ext(self, action):
+    def process_output_ext(self, action):
         """
         Processes specific output for mpg321 player
         It should contain the code for the mpg_out "end_of_song"
@@ -16,3 +16,7 @@ class MPyg321Player(BasePlayer):
         which works for both versions
         """
         pass
+
+    def volume(self, percent):
+        """Adjust player's volume"""
+        self.player.sendline("GAIN {}".format(percent))
