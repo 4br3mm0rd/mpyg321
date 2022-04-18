@@ -3,7 +3,7 @@ from .consts import PlayerStatus
 
 
 class MPyg123Player(BasePlayer):
-    """Player for legacy mpg321"""
+    """Player for mpg123"""
     def __init__(self, player=None, audiodevice=None, performance_mode=True):
         self.suitable_versions = ["mpg123"]
         self.default_player = "mpg123"
