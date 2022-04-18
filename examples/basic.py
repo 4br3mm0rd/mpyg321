@@ -2,8 +2,11 @@
 MPyG321 basic example
 Playing and pausing some music
 You need to add a "sample.mp3" file in the working directory
+
+In this example, you can replace MPyg321Player by MPyg123Player
+according to the player you installed on your machine (mpg321/mpg123)
 """
-from mpyg321.mpyg321 import MPyg321Player
+from mpyg321.MPyg321Player import MPyg321Player
 from time import sleep
 
 
