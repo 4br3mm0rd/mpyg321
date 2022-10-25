@@ -3,11 +3,12 @@ from .consts import PlayerStatus
 
 
 class MPyg123Player(BasePlayer):
-    """Player for mpg123"""
-    def __init__(self, player=None, audiodevice=None, performance_mode=True):
+    """Player for legacy mpg321"""
+    def __init__(self, player=None, audiodevice=None, performance_mode=True, custom_args="", rva_mix=False):
         self.suitable_versions = ["mpg123"]
         self.default_player = "mpg123"
-        super().__init__(player, audiodevice, performance_mode)
+        custom_args += " --rva-mix " if rva_mix else ""
+        super().__init__(player, audiodevice, performance_mode, custom_args)
         if performance_mode:
             self.silence_mpyg_output()
 
@@ -24,9 +25,8 @@ class MPyg123Player(BasePlayer):
         entry (int): index of the song in the list - first is 0
         filepath: URL/Path to the list
         """
-        if self.player_version == "mpg123":
-            self.player.sendline("LOADLIST {} {}".format(entry, filepath))
-            self.status = PlayerStatus.PLAYING
+        self.player.sendline("LOADLIST {} {}".format(entry, filepath))
+        self.status = PlayerStatus.PLAYING
 
     def silence_mpyg_output(self):
         """Improves performance by silencing the mpg123 process frame output"""

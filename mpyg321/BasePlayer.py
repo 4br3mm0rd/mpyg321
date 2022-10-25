@@ -25,9 +25,9 @@ class BasePlayer:
     player_version = None         # defined inside check_player
     mpg_outs = []
 
-    def __init__(self, player=None, audiodevice=None, performance_mode=True):
+    def __init__(self, player=None, audiodevice=None, performance_mode=True, custom_args=""):
         """Builds the player and creates the callbacks"""
-        self.set_player(player, audiodevice)
+        self.set_player(player, audiodevice, custom_args)
         self.output_processor = Thread(target=self.process_output)
         self.output_processor.daemon = True
         self.performance_mode = performance_mode
@@ -50,13 +50,14 @@ player (Mpyg321Player or Mpyg123Player)""")
                 """No suitable player found: you might need to install
                 mpg123""")
 
-    def set_player(self, player, audiodevice):
+    def set_player(self, player, audiodevice, custom_args):
         """Sets the player"""
         if player is None:
             player = self.default_player
         self.check_player(player)
-        args = " --audiodevice " + audiodevice if audiodevice else ""
-        args += " -R mpyg"
+        args = " " + custom_args if custom_args != "" else ""
+        args += " --audiodevice " + audiodevice if audiodevice else ""
+        args += "-R mpyg"
         self.player = pexpect.spawn(str(player) + " " + args)
         self.player.delaybeforesend = None
         self.status = PlayerStatus.INSTANCIATED
