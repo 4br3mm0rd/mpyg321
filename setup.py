@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="mpyg321",
-    version="1.5.0",
+    version="2.0.1",
     author="4br3mm0rd",
     author_email="4br3mm0rd@gmail.com",
     description="mpg321 wrapper for python - command line music player",
@@ -13,6 +13,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/4br3mm0rd/mpyg321",
     packages=setuptools.find_packages(),
+    install_requires=["pexpect"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
