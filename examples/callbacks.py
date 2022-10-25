@@ -64,7 +64,7 @@ def do_some_play_pause(player):
 
 def main():
     """Do the magic"""
-    player = MyPlayer()
+    player = MyPlayer(rva_mix=True)
     do_some_play_pause(player)
 
 
