@@ -24,9 +24,8 @@ class MPyg123Player(BasePlayer):
         entry (int): index of the song in the list - first is 0
         filepath: URL/Path to the list
         """
-        if self.player_version == "mpg123":
-            self.player.sendline("LOADLIST {} {}".format(entry, filepath))
-            self.status = PlayerStatus.PLAYING
+        self.player.sendline("LOADLIST {} {}".format(entry, filepath))
+        self.status = PlayerStatus.PLAYING
 
     def silence_mpyg_output(self):
         """Improves performance by silencing the mpg123 process frame output"""
