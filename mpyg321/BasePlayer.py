@@ -57,7 +57,7 @@ player (Mpyg321Player or Mpyg123Player)""")
         self.check_player(player)
         args = " " + custom_args if custom_args != "" else ""
         args += " --audiodevice " + audiodevice if audiodevice else ""
-        args += "-R mpyg"
+        args += " -R mpyg"
         self.player = pexpect.spawn(str(player) + " " + args)
         self.player.delaybeforesend = None
         self.status = PlayerStatus.INSTANCIATED
