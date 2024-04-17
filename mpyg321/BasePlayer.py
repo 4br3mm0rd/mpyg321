@@ -5,32 +5,46 @@ both to mpg321 and mpg123.
 All the players implement this base class and add their
 specific feature.
 """
-import pexpect
+
 import subprocess
 from threading import Thread
-from .MpygError import *
+
+import pexpect
+
 from .consts import *
+from .MpygError import *
 
 
 class BasePlayer:
     """Base class for players"""
+
     player = None
     status = None
     output_processor = None
     song_path = ""
     loop = False
     performance_mode = True
-    suitable_versions = []        # mpg123 and/or mpg321 - set inside subclass
-    default_player = None         # mpg123 or mpg321 - set inside subclass
-    player_version = None         # defined inside check_player
+    suitable_versions = []  # mpg123 and/or mpg321 - set inside subclass
+    default_player = None  # mpg123 or mpg321 - set inside subclass
+    player_version = None  # defined inside check_player
     mpg_outs = []
+    _events = {}
 
-    def __init__(self, player=None, audiodevice=None, performance_mode=True, custom_args=""):
+    def __init__(
+        self, player=None, audiodevice=None, performance_mode=True, custom_args=""
+    ):
         """Builds the player and creates the callbacks"""
         self.set_player(player, audiodevice, custom_args)
         self.output_processor = Thread(target=self.process_output)
         self.output_processor.daemon = True
         self.performance_mode = performance_mode
+        self._events = {
+            "user_stop": [],
+            "user_pause": [],
+            "user_resume": [],
+            "any_stop": [],
+            "music_end": [],
+        }
         self.output_processor.start()
 
     def check_player(self, player):
@@ -44,11 +58,13 @@ class BasePlayer:
             if self.player_version is None:
                 raise MPygPlayerNotFoundError(
                     """No suitable player found: you might be using the wrong \
-player (Mpyg321Player or Mpyg123Player)""")
+player (Mpyg321Player or Mpyg123Player)"""
+                )
         except subprocess.SubprocessError:
             raise MPygPlayerNotFoundError(
                 """No suitable player found: you might need to install
-                mpg123""")
+                mpg123"""
+            )
 
     def set_player(self, player, audiodevice, custom_args):
         """Sets the player"""
@@ -64,6 +80,32 @@ player (Mpyg321Player or Mpyg123Player)""")
         # Setting extended mpg_outs for version specific behaviors
         self.mpg_outs = mpg_outs.copy()
         self.mpg_outs.extend(mpg_outs_ext[self.player_version])
+
+    def on(self, event_name):
+        """Decorator to register event callbacks."""
+
+        def decorator(func):
+            if event_name not in self._events:
+                raise MPygUnknownEventName(
+                    "Subscribed callback to a non existing event. Valid events are: user_stop, user_pause, user_resume, any_stop or music_end."
+                )
+            self._events[event_name].append(func)
+            return func
+
+        return decorator
+
+    def subscribe_event(self, event_name, callback):
+        if event_name not in self._events:
+            raise MPygUnknownEventName(
+                "Subscribed callback to a non existing event. Valid events are: user_stop, user_pause, user_resume, any_stop or music_end."
+            )
+        self._events[event_name].append(callback)
+
+    def _trigger_event(self, event_name):
+        """Trigger all callbacks associated with an event."""
+        if event_name in self._events:
+            for callback in self._events[event_name]:
+                callback()
 
     def process_output(self):
         """Parses the output"""
@@ -109,6 +151,7 @@ player (Mpyg321Player or Mpyg123Player)""")
         """Resume the player"""
         if self.status == PlayerStatus.PAUSED:
             self.player.sendline("PAUSE")
+            self._trigger_event("user_resume")
             self.on_user_resume()
 
     def stop(self):
@@ -154,7 +197,7 @@ player (Mpyg321Player or Mpyg123Player)""")
         self.song_path = path
 
     def set_loop(self, loop):
-        """"loop setter"""
+        """loop setter"""
         self.loop = loop
 
     # # # Internal Callbacks # # #
@@ -168,12 +211,16 @@ player (Mpyg321Player or Mpyg123Player)""")
 
     def on_user_stop_int(self):
         """Internal callback when the user stops the music."""
+        self._trigger_event("any_stop")
         self.on_any_stop()
+        self._trigger_event("user_stop")
         self.on_user_stop()
 
     def on_user_pause_int(self):
         """Internal callback when user pauses the music"""
+        self._trigger_event("any_stop")
         self.on_any_stop()
+        self._trigger_event("user_pause")
         self.on_user_pause()
 
     def on_user_start_or_resume_int(self):
@@ -182,11 +229,13 @@ player (Mpyg321Player or Mpyg123Player)""")
 
     def on_end_of_song_int(self):
         """Internal callback when the song ends"""
-        if(self.loop):
+        if self.loop:
             self.play()
         else:
             # The music doesn't stop if it is looped
+            self._trigger_event("any_stop")
             self.on_any_stop()
+        self._trigger_event("music_end")
         self.on_music_end()
 
     # # # Public Callbacks # # #
@@ -205,7 +254,7 @@ player (Mpyg321Player or Mpyg123Player)""")
     def on_user_stop(self):
         """Callback when user stops music"""
         pass
- 
+
     def on_music_end(self):
         """Callback when music ends"""
         pass
