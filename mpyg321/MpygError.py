@@ -41,7 +41,13 @@ class MPygPlayerNotFoundError(MPygError):
     pass
 
 
-class MPygUnknownEventName(MPygError):
+class MPygUnknownEventNameError(MPygError):
     """Errors encountered when creating an event listener for a non existing event"""
+
+    pass
+
+
+class MPygEventListenerError(MPygError):
+    """Errors encountered when an event listener throws an exception"""
 
     pass
