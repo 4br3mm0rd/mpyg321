@@ -1,11 +1,11 @@
-class EventContext:
+class MPyg321EventContext:
     """Base class for all events"""
 
     def __init__(self, player) -> None:
         self.player = player
 
 
-class ErrorContext(EventContext):
+class MPyg321ErrorContext(MPyg321EventContext):
     """Context for error events"""
 
     def __init__(self, player, error_type, error_message) -> None:

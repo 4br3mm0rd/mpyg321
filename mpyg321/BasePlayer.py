@@ -99,7 +99,7 @@ player (Mpyg321Player or Mpyg123Player)"""
     def _trigger_event(self, event_name, context=None):
         """Trigger all callbacks associated with an event."""
         if context is None:
-            context = EventContext(self)
+            context = MPyg321EventContext(self)
         if event_name in self._events:
             for callback in self._events[event_name]:
                 try:
