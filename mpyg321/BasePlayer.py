@@ -39,7 +39,7 @@ class BasePlayer:
         self.output_processor = Thread(target=self.process_output)
         self.output_processor.daemon = True
         self.performance_mode = performance_mode
-        self._events = {e: [] for e in Events}
+        self._events = {e: [] for e in MPyg321Events}
         self.output_processor.start()
 
     def check_player(self, player):
@@ -153,7 +153,7 @@ player (Mpyg321Player or Mpyg123Player)"""
         """Resume the player"""
         if self.status == PlayerStatus.PAUSED:
             self.player.sendline("PAUSE")
-            self._trigger_event(Events.USER_RESUME)
+            self._trigger_event(MPyg321Events.USER_RESUME)
             self.on_user_resume()
 
     def stop(self):
@@ -179,7 +179,7 @@ player (Mpyg321Player or Mpyg123Player)"""
             if mpg_error["message"] in output:
                 action = mpg_error["action"]
                 context = ErrorContext(self, action, output)
-                self._trigger_event(Events.ERROR, context)
+                self._trigger_event(MPyg321Events.ERROR, context)
                 if action == "generic_error":
                     raise MPygError(output)
                 if action == "file_error":
@@ -195,7 +195,7 @@ player (Mpyg321Player or Mpyg123Player)"""
 
         # Some other error occurred
         context = ErrorContext(self, "unknown_error", output)
-        self._trigger_event(Events.ERROR, context)
+        self._trigger_event(MPyg321Events.ERROR, context)
         raise MPygError(output)
 
     def set_song(self, path):
@@ -217,16 +217,16 @@ player (Mpyg321Player or Mpyg123Player)"""
 
     def on_user_stop_int(self):
         """Internal callback when the user stops the music."""
-        self._trigger_event(Events.ANY_STOP)
+        self._trigger_event(MPyg321Events.ANY_STOP)
         self.on_any_stop()
-        self._trigger_event(Events.USER_STOP)
+        self._trigger_event(MPyg321Events.USER_STOP)
         self.on_user_stop()
 
     def on_user_pause_int(self):
         """Internal callback when user pauses the music"""
-        self._trigger_event(Events.ANY_STOP)
+        self._trigger_event(MPyg321Events.ANY_STOP)
         self.on_any_stop()
-        self._trigger_event(Events.USER_PAUSE)
+        self._trigger_event(MPyg321Events.USER_PAUSE)
         self.on_user_pause()
 
     def on_user_start_or_resume_int(self):
@@ -239,9 +239,9 @@ player (Mpyg321Player or Mpyg123Player)"""
             self.play()
         else:
             # The music doesn't stop if it is looped
-            self._trigger_event(Events.ANY_STOP)
+            self._trigger_event(MPyg321Events.ANY_STOP)
             self.on_any_stop()
-        self._trigger_event(Events.MUSIC_END)
+        self._trigger_event(MPyg321Events.MUSIC_END)
         self.on_music_end()
 
     # # # Public Callbacks # # #

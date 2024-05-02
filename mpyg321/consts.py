@@ -91,7 +91,7 @@ class PlayerStatus:
     QUITTED = 6
 
 
-class Events(Enum):
+class MPyg321Events(Enum):
     USER_STOP = "user_stop"
     USER_PAUSE = "user_pause"
     USER_RESUME = "user_resume"
