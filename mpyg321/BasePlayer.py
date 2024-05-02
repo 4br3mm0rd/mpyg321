@@ -178,7 +178,7 @@ player (Mpyg321Player or Mpyg123Player)"""
         for mpg_error in mpg_errors:
             if mpg_error["message"] in output:
                 action = mpg_error["action"]
-                context = ErrorContext(self, action, output)
+                context = MPyg321ErrorContext(self, action, output)
                 self._trigger_event(MPyg321Events.ERROR, context)
                 if action == "generic_error":
                     raise MPygError(output)
@@ -194,7 +194,7 @@ player (Mpyg321Player or Mpyg123Player)"""
                     raise MPygSeekError
 
         # Some other error occurred
-        context = ErrorContext(self, "unknown_error", output)
+        context = MPyg321ErrorContext(self, "unknown_error", output)
         self._trigger_event(MPyg321Events.ERROR, context)
         raise MPygError(output)
 
