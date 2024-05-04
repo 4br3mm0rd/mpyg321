@@ -7,3 +7,4 @@ examples/*.mp3
 examples/mpyg321
 examples/tests.py
 examples/*.txt
+venv

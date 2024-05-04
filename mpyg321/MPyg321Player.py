@@ -1,13 +1,16 @@
 from .BasePlayer import BasePlayer
+from .consts import MPyg321Events
 
 
 class MPyg321Player(BasePlayer):
     """Player for legacy mpg321"""
-    def __init__(self, player=None, audiodevice=None, performance_mode=True, custom_args=""):
+
+    def __init__(
+        self, player=None, audiodevice=None, performance_mode=True, custom_args=""
+    ):
         self.suitable_versions = ["mpg321"]
         self.default_player = "mpg321"
         super().__init__(player, audiodevice, performance_mode, custom_args)
-
 
     def process_output_ext(self, action):
         """
