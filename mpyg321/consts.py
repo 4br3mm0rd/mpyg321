@@ -98,3 +98,5 @@ class MPyg321Events(Enum):
     ANY_STOP = "any_stop"
     MUSIC_END = "music_end"
     ERROR = "error"
+    USER_MUTE = "mute"
+    USER_UNMUTE = "unmute"

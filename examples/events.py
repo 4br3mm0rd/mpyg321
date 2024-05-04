@@ -10,9 +10,9 @@ according to the player you installed on your machine (mpg321/mpg123)
 from time import sleep
 
 from mpyg321.consts import MPyg321Events
-from mpyg321.MPyg321Player import MPyg321Player
+from mpyg321.MPyg123Player import MPyg123Player
 
-player = MPyg321Player()
+player = MPyg123Player()
 
 
 @player.on(MPyg321Events.ANY_STOP)

@@ -35,11 +35,11 @@ class BasePlayer:
         self, player=None, audiodevice=None, performance_mode=True, custom_args=""
     ):
         """Builds the player and creates the callbacks"""
+        self._events = {e: [] for e in MPyg321Events}
         self.set_player(player, audiodevice, custom_args)
         self.output_processor = Thread(target=self.process_output)
         self.output_processor.daemon = True
         self.performance_mode = performance_mode
-        self._events = {e: [] for e in MPyg321Events}
         self.output_processor.start()
 
     def check_player(self, player):
@@ -82,7 +82,7 @@ player (Mpyg321Player or Mpyg123Player)"""
         def decorator(func):
             if event_name not in self._events:
                 raise MPygUnknownEventNameError(
-                    "Subscribed callback to a non existing event. Valid events are: user_stop, user_pause, user_resume, any_stop or music_end."
+                    f"Subscribed callback to a non existing event {event_name}."
                 )
             self._events[event_name].append(func)
             return func
@@ -92,7 +92,7 @@ player (Mpyg321Player or Mpyg123Player)"""
     def subscribe_event(self, event_name, callback):
         if event_name not in self._events:
             raise MPygUnknownEventNameError(
-                "Subscribed callback to a non existing event. Valid events are: user_stop, user_pause, user_resume, any_stop or music_end."
+                f"Subscribed callback to a non existing event {event_name}."
             )
         self._events[event_name].append(callback)
 

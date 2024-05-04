@@ -1,10 +1,19 @@
 from .BasePlayer import BasePlayer
-from .consts import PlayerStatus
+from .consts import MPyg321Events, PlayerStatus
+from .EventContext import MPyg321EventContext
 
 
 class MPyg123Player(BasePlayer):
     """Player for legacy mpg321"""
-    def __init__(self, player=None, audiodevice=None, performance_mode=True, custom_args="", rva_mix=False):
+
+    def __init__(
+        self,
+        player=None,
+        audiodevice=None,
+        performance_mode=True,
+        custom_args="",
+        rva_mix=False,
+    ):
         self.suitable_versions = ["mpg123"]
         self.default_player = "mpg123"
         custom_args += " --rva-mix " if rva_mix else ""
@@ -16,7 +25,9 @@ class MPyg123Player(BasePlayer):
         """Processes specific output for mpg123 player"""
         if action == "user_mute":
             self.on_user_mute()
+            self._trigger_event(MPyg321Events.USER_MUTE, MPyg321EventContext(self))
         elif action == "user_unmute":
+            self._trigger_event(MPyg321Events.USER_UNMUTE, MPyg321EventContext(self))
             self.on_user_unmute()
 
     def load_list(self, entry, filepath):
