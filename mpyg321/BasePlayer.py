@@ -149,6 +149,13 @@ player (Mpyg321Player or Mpyg123Player)"""
             self.player.sendline("PAUSE")
             self.status = PlayerStatus.PAUSED
 
+    def toggle_pause(self):
+        """Pause if playing, else resume if paused"""
+        if self.status == PlayerStatus.PLAYING:
+            self.pause()
+        elif self.status == PlayerStatus.PAUSED:
+            self.resume()            
+
     def resume(self):
         """Resume the player"""
         if self.status == PlayerStatus.PAUSED:
