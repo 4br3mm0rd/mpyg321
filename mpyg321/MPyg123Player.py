@@ -4,7 +4,7 @@ from .EventContext import MPyg321EventContext
 
 
 class MPyg123Player(BasePlayer):
-    """Player for legacy mpg321"""
+    """Player for mpg123"""
 
     def __init__(
         self,
