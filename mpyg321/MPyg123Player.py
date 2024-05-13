@@ -20,7 +20,7 @@ class MPyg123Player(BasePlayer):
         super().__init__(player, audiodevice, performance_mode, custom_args)
         if performance_mode:
             self.silence_mpyg_output()
-        self.__is_muted = False            
+        self._is_muted = False            
 
     def process_output_ext(self, action):
         """Processes specific output for mpg123 player"""
@@ -47,18 +47,19 @@ class MPyg123Player(BasePlayer):
     def mute(self):
         """Mutes the player"""
         self.player.sendline("MUTE")
+        self._is_muted = True
 
     def unmute(self):
         """Unmutes the player"""
         self.player.sendline("UNMUTE")
+        self._is_muted = False
 
     def toggle_mute(self):
         """Mute or UnMute if playing"""
-        if self.__is_muted:
+        if self._is_muted:
             self.unmute()
         else:
             self.mute()
-        self.__is_muted = not self.__is_muted
 
     def volume(self, percent):
         """Adjust player's volume"""
