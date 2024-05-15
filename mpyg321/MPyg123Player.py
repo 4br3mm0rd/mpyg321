@@ -25,9 +25,11 @@ class MPyg123Player(BasePlayer):
     def process_output_ext(self, action):
         """Processes specific output for mpg123 player"""
         if action == "user_mute":
+            self._is_muted = True
             self.on_user_mute()
             self._trigger_event(MPyg321Events.USER_MUTE, MPyg321EventContext(self))
         elif action == "user_unmute":
+            self._is_muted = False
             self._trigger_event(MPyg321Events.USER_UNMUTE, MPyg321EventContext(self))
             self.on_user_unmute()
 
@@ -47,12 +49,10 @@ class MPyg123Player(BasePlayer):
     def mute(self):
         """Mutes the player"""
         self.player.sendline("MUTE")
-        self._is_muted = True
 
     def unmute(self):
         """Unmutes the player"""
         self.player.sendline("UNMUTE")
-        self._is_muted = False
 
     def toggle_mute(self):
         """Mute or UnMute if playing"""
