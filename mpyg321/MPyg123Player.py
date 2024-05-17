@@ -4,7 +4,7 @@ from .EventContext import MPyg321EventContext
 
 
 class MPyg123Player(BasePlayer):
-    """Player for legacy mpg321"""
+    """Player for mpg123"""
 
     def __init__(
         self,
@@ -20,13 +20,16 @@ class MPyg123Player(BasePlayer):
         super().__init__(player, audiodevice, performance_mode, custom_args)
         if performance_mode:
             self.silence_mpyg_output()
+        self._is_muted = False            
 
     def process_output_ext(self, action):
         """Processes specific output for mpg123 player"""
         if action == "user_mute":
+            self._is_muted = True
             self.on_user_mute()
             self._trigger_event(MPyg321Events.USER_MUTE, MPyg321EventContext(self))
         elif action == "user_unmute":
+            self._is_muted = False
             self._trigger_event(MPyg321Events.USER_UNMUTE, MPyg321EventContext(self))
             self.on_user_unmute()
 
@@ -50,6 +53,13 @@ class MPyg123Player(BasePlayer):
     def unmute(self):
         """Unmutes the player"""
         self.player.sendline("UNMUTE")
+
+    def toggle_mute(self):
+        """Mute or UnMute if playing"""
+        if self._is_muted:
+            self.unmute()
+        else:
+            self.mute()
 
     def volume(self, percent):
         """Adjust player's volume"""
