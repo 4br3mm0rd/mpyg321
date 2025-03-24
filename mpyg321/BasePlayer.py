@@ -160,6 +160,7 @@ player (Mpyg321Player or Mpyg123Player)"""
         """Resume the player"""
         if self.status == PlayerStatus.PAUSED:
             self.player.sendline("PAUSE")
+            self.status = PlayerStatus.PLAYING
             self._trigger_event(MPyg321Events.USER_RESUME)
             self.on_user_resume()
 
